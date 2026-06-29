@@ -46,7 +46,7 @@ export const projects = [
   },
   {
     title: 'Vivantal',
-    description: "Developer. Healthcare has blind spots; Vivantal doesn't. Building tools to close the gaps in care.",
+    description: "Co-founder. Healthcare has blind spots; Vivantal doesn't. Building tools to close the gaps in care.",
     tags: [],
     link: 'https://vivantal.com',
   },
@@ -90,7 +90,7 @@ export const experience = [
     company: 'Albert Einstein College of Medicine · Remote',
     period: 'Jan 2026 – Present',
     bullets: [
-      'Innovating with machine learning in the medical field.',
+      'Innovating in medicine with machine learning.',
     ],
   },
   {
@@ -122,7 +122,7 @@ export const experience = [
     company: 'Northwestern Medicine · On-site',
     period: 'May 2026 – Present',
     bullets: [
-      'Assisting with administrative tasks and directing visitors to their locations.',
+      'Patient Care and Healthcare workflow.',
     ],
   },
   {
