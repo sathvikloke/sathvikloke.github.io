@@ -41,13 +41,13 @@ export const projects = [
   {
     title: 'LANDER',
     description: 'Co-founder. Screening ACL tear risk in athletes, using data and modeling to flag injury risk before it happens.',
-    tags: ['Co-Founder', 'Sports Medicine', 'ML'],
+    tags: ['Computer Vision', 'Sports Medicine', 'ML'],
     link: 'https://land-r.netlify.app',
   },
   {
     title: 'Vivantal',
     description: "Developer. Healthcare has blind spots; Vivantal doesn't. Building tools to close the gaps in care.",
-    tags: ['Developer', 'Healthcare', 'Startup'],
+    tags: ['Patient Interface', 'Healthcare', 'Startup'],
     link: 'https://vivantal.com',
   },
 ]
@@ -106,7 +106,7 @@ export const experience = [
     company: 'Project Pulmonary',
     period: 'May 2026 – Present',
     bullets: [
-      '[Add a bullet on what you lead at Project Pulmonary.]',
+      'Promoting care for firefighters exposed to harmful carcinogens when fighting wildfires.',
     ],
   },
   {
@@ -114,7 +114,7 @@ export const experience = [
     company: 'Health For Humanity · Remote',
     period: 'Feb 2026 – Present',
     bullets: [
-      '[Add a bullet on what you do as Chapter Development Director.]',
+      'Helping develop chapters across the country for Health for Humanity. Raising awareness to younger children about CPR/AED.',
     ],
   },
   {
@@ -122,7 +122,7 @@ export const experience = [
     company: 'Northwestern Medicine · On-site',
     period: 'May 2026 – Present',
     bullets: [
-      '[Add a bullet on your volunteer work at Northwestern Medicine.]',
+      'Assisting with administrative tasks and directing visitors to their locations.',
     ],
   },
   {
