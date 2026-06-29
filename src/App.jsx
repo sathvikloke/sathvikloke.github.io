@@ -309,9 +309,6 @@ export default function App() {
           <Contact />
         </main>
       )}
-      <footer className="footer">
-        <p>© {new Date().getFullYear()} {profile.name}</p>
-      </footer>
     </>
   )
 }
