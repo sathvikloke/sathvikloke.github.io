@@ -41,13 +41,13 @@ export const projects = [
   {
     title: 'LANDER',
     description: 'Co-founder. Screening ACL tear risk in athletes, using data and modeling to flag injury risk before it happens.',
-    tags: ['Computer Vision', 'Sports Medicine', 'ML'],
+    tags: [],
     link: 'https://land-r.netlify.app',
   },
   {
     title: 'Vivantal',
     description: "Developer. Healthcare has blind spots; Vivantal doesn't. Building tools to close the gaps in care.",
-    tags: ['Patient Interface', 'Healthcare', 'Startup'],
+    tags: [],
     link: 'https://vivantal.com',
   },
 ]
