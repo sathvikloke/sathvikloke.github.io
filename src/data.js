@@ -18,9 +18,9 @@ export const about = [
 ]
 
 export const skills = [
-  'Python', 'PyTorch', 'Pandas', 'Matplotlib',
+  'Leadership', 'Research', 'Collaboration', 'Matplotlib',
   'Deep Learning', 'Machine Learning', 'Medical Imaging',
-  'Research', 'Data Analysis', 'CPR Certified',
+  'Python', 'Data Analysis', 'CPR Certified','Biology'
 ]
 
 export const education = [
@@ -90,7 +90,7 @@ export const experience = [
     company: 'Albert Einstein College of Medicine · Remote',
     period: 'Jan 2026 – Present',
     bullets: [
-      'Innovating with large vision-language models (LVLMs) and deep learning across medical imaging projects.',
+      'Innovating with machine learning in the medical field.',
     ],
   },
   {
