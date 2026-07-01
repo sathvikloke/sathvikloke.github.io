@@ -96,18 +96,44 @@ function Nav({ page }) {
 }
 
 function Hero() {
+  const fullName = `${profile.name}.`
+  const [typed, setTyped] = useState('')
+  const [done, setDone] = useState(false)
+
+  useEffect(() => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduce) { setTyped(fullName); setDone(true); return }
+    let i = 0
+    const id = setInterval(() => {
+      i += 1
+      setTyped(fullName.slice(0, i))
+      if (i >= fullName.length) {
+        clearInterval(id)
+        setTimeout(() => setDone(true), 350)
+      }
+    }, 90)
+    return () => clearInterval(id)
+  }, [])
+
+  const reveal = (base, delay) => ({
+    className: `${base} reveal-el ${done ? 'is-in' : ''}`,
+    style: { transitionDelay: done ? delay : '0s' },
+  })
+
   return (
     <section id="top" className="hero">
       <p className="hero__eyebrow">{profile.role}</p>
-      <h1 className="hero__name">{profile.name}.</h1>
-      <p className="hero__sub">{profile.subhead}</p>
-      <p className="hero__tagline">{profile.tagline}</p>
-      <div className="hero__actions">
+      <h1 className="hero__name" aria-label={fullName}>
+        <span>{typed}</span><span className={`caret ${done ? 'caret--idle' : ''}`} aria-hidden="true" />
+      </h1>
+      <p {...reveal('hero__sub', '0.05s')}>{profile.subhead}</p>
+      <p {...reveal('hero__tagline', '0.15s')}>{profile.tagline}</p>
+      <div {...reveal('hero__actions', '0.25s')}>
         <a className="btn btn--primary" href="#research">View research</a>
         <a className="btn" href="https://www.linkedin.com/in/sathvik-loke" target="_blank" rel="noreferrer">LinkedIn ↗</a>
         <a className="btn" href={`mailto:${profile.email}`}>Email</a>
       </div>
-      <p className="hero__meta">{profile.location}</p>
+      <p {...reveal('hero__meta', '0.35s')}>{profile.location}</p>
     </section>
   )
 }

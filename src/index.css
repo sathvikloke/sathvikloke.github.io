@@ -91,8 +91,35 @@ a { color: inherit; text-decoration: none; }
   font-family: var(--serif);
   font-size: clamp(3rem, 8vw, 5.2rem);
   line-height: 1.0; margin: 0 0 6px; letter-spacing: -0.02em; font-weight: 600;
+  min-height: 1.05em;
+}
+.hero__name > span:first-child {
   background: linear-gradient(110deg, #ffffff 0%, var(--accent) 52%, var(--accent-2) 100%);
   -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.caret {
+  display: inline-block;
+  width: 4px; height: 0.82em;
+  margin-left: 8px;
+  background: var(--accent-2);
+  border-radius: 1px;
+  vertical-align: baseline;
+  box-shadow: 0 0 10px rgba(255, 121, 198, 0.7);
+  animation: caret-blink 1s step-end infinite;
+}
+.caret--idle { animation: caret-blink 1.1s step-end infinite; }
+@keyframes caret-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+
+/* Eyebrow fades in on load */
+.hero__eyebrow { animation: hero-fade-up 0.5s ease both; }
+@keyframes hero-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* Staggered reveal for hero elements after the name finishes typing */
+.reveal-el { opacity: 0; transform: translateY(12px); transition: opacity 0.55s ease, transform 0.55s ease; }
+.reveal-el.is-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal-el { opacity: 1; transform: none; transition: none; }
+  .caret { animation: none; }
 }
 .hero__sub {
   font-family: var(--serif); font-style: italic;
