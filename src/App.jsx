@@ -360,6 +360,11 @@ export default function App() {
     document.title = `${profile.name} · Portfolio`
   }, [])
 
+  // Safety: make sure scrolling is never left locked once the intro is gone
+  useEffect(() => {
+    if (!booting) document.body.style.overflow = ''
+  }, [booting])
+
   // Scroll to the target section after a page/hash change
   useEffect(() => {
     const id = hash.slice(1)
@@ -368,16 +373,22 @@ export default function App() {
     if (el) el.scrollIntoView({ behavior: 'smooth' })
   }, [hash, page])
 
-  // Scroll-reveal for sections
+  // Scroll-reveal for sections (with a fail-safe so content can never stay hidden)
   useEffect(() => {
-    if (!('IntersectionObserver' in window)) return
+    const els = document.querySelectorAll('.section')
+    const revealAll = () => els.forEach((el) => el.classList.add('is-visible'))
+
+    if (!('IntersectionObserver' in window)) { revealAll(); return }
+
     document.body.classList.add('reveal-ready')
     const obs = new IntersectionObserver((entries) => {
       entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add('is-visible') })
-    }, { threshold: 0.08 })
-    const els = document.querySelectorAll('.section')
+    }, { threshold: 0.05, rootMargin: '0px 0px 120px 0px' })
     els.forEach((el) => obs.observe(el))
-    return () => obs.disconnect()
+
+    // Fail-safe: whatever happens, reveal everything within 1.5s
+    const fallback = setTimeout(revealAll, 1500)
+    return () => { obs.disconnect(); clearTimeout(fallback) }
   }, [page])
 
   return (
