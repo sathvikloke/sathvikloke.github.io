@@ -65,6 +65,72 @@ function CursorFX() {
   return null
 }
 
+function Intro({ onFinish }) {
+  const [lines, setLines] = useState([])
+  const [pct, setPct] = useState(0)
+  const [leaving, setLeaving] = useState(false)
+
+  useEffect(() => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduce) { onFinish(); return }
+
+    const script = [
+      '> initializing system…',
+      '> loading modules [ neuro · ml · imaging ]',
+      '> compiling portfolio.jsx',
+      '> establishing secure connection',
+      '> decrypting identity: SATHVIK LOKE',
+      '> ready.',
+    ]
+    document.body.style.overflow = 'hidden'
+
+    const timers = []
+    let li = 0
+    const addLine = () => {
+      setLines((prev) => [...prev, script[li]])
+      li += 1
+      if (li < script.length) timers.push(setTimeout(addLine, 220 + Math.random() * 160))
+    }
+    timers.push(setTimeout(addLine, 200))
+
+    const prog = setInterval(() => {
+      setPct((p) => Math.min(100, p + Math.random() * 11 + 3))
+    }, 120)
+
+    timers.push(setTimeout(() => {
+      clearInterval(prog)
+      setPct(100)
+      setLeaving(true)
+      timers.push(setTimeout(onFinish, 650))
+    }, 2000))
+
+    return () => {
+      timers.forEach(clearTimeout)
+      clearInterval(prog)
+      document.body.style.overflow = ''
+    }
+  }, [])
+
+  const lineClass = (l) =>
+    l.includes('SATHVIK') ? 'intro__line intro__line--id'
+      : l.includes('ready') ? 'intro__line intro__line--ok'
+      : 'intro__line'
+
+  return (
+    <div className={`intro ${leaving ? 'intro--leave' : ''}`} aria-hidden="true">
+      <div className="intro__scan" />
+      <div className="intro__inner">
+        <div className="intro__log">
+          {lines.map((l, i) => <div key={i} className={lineClass(l)}>{l}</div>)}
+          <span className="intro__cursor">▋</span>
+        </div>
+        <div className="intro__bar"><div className="intro__fill" style={{ width: `${pct}%` }} /></div>
+        <div className="intro__pct">{Math.floor(pct)}%</div>
+      </div>
+    </div>
+  )
+}
+
 function Nav({ page }) {
   const [open, setOpen] = useState(false)
   const links = page === 'research'
@@ -95,12 +161,13 @@ function Nav({ page }) {
   )
 }
 
-function Hero() {
+function Hero({ ready }) {
   const fullName = `${profile.name}.`
   const [typed, setTyped] = useState('')
   const [done, setDone] = useState(false)
 
   useEffect(() => {
+    if (!ready) return
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduce) { setTyped(fullName); setDone(true); return }
     let i = 0
@@ -113,7 +180,7 @@ function Hero() {
       }
     }, 90)
     return () => clearInterval(id)
-  }, [])
+  }, [ready])
 
   const reveal = (base, delay) => ({
     className: `${base} reveal-el ${done ? 'is-in' : ''}`,
@@ -287,6 +354,7 @@ function Contact() {
 export default function App() {
   const hash = useHashRoute()
   const page = (hash.startsWith('#research') || hash.startsWith('#awards')) ? 'research' : 'home'
+  const [booting, setBooting] = useState(true)
 
   useEffect(() => {
     document.title = `${profile.name} · Portfolio`
@@ -314,6 +382,7 @@ export default function App() {
 
   return (
     <>
+      {booting && <Intro onFinish={() => setBooting(false)} />}
       <CursorFX />
       <Nav page={page} />
       {page === 'research' ? (
@@ -327,7 +396,7 @@ export default function App() {
         </main>
       ) : (
         <main className="container">
-          <Hero />
+          <Hero ready={!booting} />
           <About />
           <Education />
           <Experience />
