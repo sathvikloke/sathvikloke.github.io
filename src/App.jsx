@@ -87,7 +87,8 @@ function Intro({ onFinish }) {
     const timers = []
     let li = 0
     const addLine = () => {
-      setLines((prev) => [...prev, script[li]])
+      const line = script[li]
+      if (line !== undefined) setLines((prev) => [...prev, line])
       li += 1
       if (li < script.length) timers.push(setTimeout(addLine, 220 + Math.random() * 160))
     }
@@ -111,7 +112,7 @@ function Intro({ onFinish }) {
     }
   }, [])
 
-  const lineClass = (l) =>
+  const lineClass = (l = '') =>
     l.includes('SATHVIK') ? 'intro__line intro__line--id'
       : l.includes('ready') ? 'intro__line intro__line--ok'
       : 'intro__line'
