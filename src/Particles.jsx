@@ -118,7 +118,6 @@ const scatterPt = (i, N) => {
 
 export default function Particles({ shape = 'scatter', playing = false }) {
   const ref = useRef(null)
-  const api = useRef({ morph: null })
 
   // keep the latest props visible to the animation loop without restarting it
   const live = useRef({ shape, playing })
@@ -167,8 +166,15 @@ export default function Particles({ shape = 'scatter', playing = false }) {
         P[i].tx = pts[i][0]; P[i].ty = pts[i][1]; P[i].tz = pts[i][2]
       }
     }
-    api.current.morph = morph
-    morph(live.current.shape)
+
+    // The loop owns the shape rather than an effect pushing into it. Under
+    // React's dev double-mount an effect can hold a morph bound to a discarded
+    // particle array, which silently leaves the cloud stuck on its first form.
+    let applied = null
+
+    // Silhouettes are essentially flat, so spinning them a full turn sends them
+    // edge-on and they disappear. Those sway; the volumetric shapes rotate.
+    const FLAT = new Set(['person', 'computer', 'phone'])
 
     let rot = 0, mx = 0, my = 0, tmx = 0, tmy = 0, raf
     const onMove = (e) => {
@@ -178,15 +184,26 @@ export default function Particles({ shape = 'scatter', playing = false }) {
     window.addEventListener('mousemove', onMove)
 
     const frame = (now = 0) => {
+      if (live.current.shape !== applied) {
+        applied = live.current.shape
+        morph(applied)
+      }
       cx.clearRect(0, 0, W, H)
       rot += reduce ? 0 : 0.0016
       mx += (tmx - mx) * 0.045
       my += (tmy - my) * 0.045
 
-      const cxp = W / 2
+      const flat = FLAT.has(live.current.shape)
+      // a flat shape sways within ±24° so it always stays readable
+      const spin = flat ? Math.sin(rot * 0.9) * 0.42 : rot
+
+      // On wide screens the copy is left-aligned, so push the cloud into the
+      // empty right-hand side instead of letting it sit behind the text.
+      const wide = window.innerWidth >= 1000
+      const cxp = W * (wide ? 0.72 : 0.5)
       const cyp = H * (window.innerWidth < 760 ? 0.4 : 0.46)
       const scale = Math.min(W, H) * (window.innerWidth < 760 ? 0.3 : 0.27)
-      const cosR = Math.cos(rot + mx * 0.55), sinR = Math.sin(rot + mx * 0.55)
+      const cosR = Math.cos(spin + mx * 0.55), sinR = Math.sin(spin + mx * 0.55)
       const tilt = -0.32 + my * 0.3
       const cosT = Math.cos(tilt), sinT = Math.sin(tilt)
       const isWaves = live.current.shape === 'waves'
@@ -231,9 +248,5 @@ export default function Particles({ shape = 'scatter', playing = false }) {
     }
   }, [])
 
-  useEffect(() => {
-    if (api.current.morph) api.current.morph(shape)
-  }, [shape])
-
-  return <canvas className="field" ref={ref} aria-hidden="true" />
+  return <canvas className="field" ref={ref} data-shape={shape} aria-hidden="true" />
 }
