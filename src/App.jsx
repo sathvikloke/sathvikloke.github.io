@@ -134,27 +134,18 @@ function Intro({ onFinish }) {
   )
 }
 
+// One short, stable set of destinations. The old nav listed six section
+// anchors, which wrapped onto two lines and collided with the wordmark.
+const NAV = [
+  ['#work', 'Work'],
+  ['#research', 'Research'],
+  ['#music', 'Music'],
+  ['#about', 'About'],
+]
+
 function Nav({ page }) {
   const [open, setOpen] = useState(false)
-  const links = page === 'research'
-    ? [
-        ['#top', '← Home'],
-        ['#research', 'Research'],
-        ['#awards', 'Awards'],
-      ]
-    : page === 'music'
-    ? [
-        ['#top', '← Home'],
-        ['#music', 'Music'],
-      ]
-    : [
-        ['#about', 'About'],
-        ['#experience', 'Experience'],
-        ['#projects', 'Projects'],
-        ['#research', 'Research & Awards'],
-        ['#music', 'Music'],
-        ['#contact', 'Contact'],
-      ]
+  const links = NAV
   return (
     <header className="nav">
       <a href="#top" className="nav__brand">{profile.name}</a>
@@ -205,9 +196,9 @@ function Hero({ ready }) {
       <p {...reveal('hero__sub', '0.05s')}>{profile.subhead}</p>
       <p {...reveal('hero__tagline', '0.15s')}>{profile.tagline}</p>
       <div {...reveal('hero__actions', '0.25s')}>
-        <a className="btn btn--primary" href="#research">View research</a>
-        <a className="btn" href="https://www.linkedin.com/in/sathvik-loke" target="_blank" rel="noreferrer">LinkedIn ↗</a>
-        <a className="btn" href={`mailto:${profile.email}`}>Email</a>
+        <a className="btn btn--primary" href="#research">The research</a>
+        <a className="btn" href="#work">What I've built</a>
+        <a className="btn" href="#music">What I listen to</a>
       </div>
       <p {...reveal('hero__meta', '0.35s')}>{profile.location}</p>
     </section>
@@ -374,13 +365,27 @@ function Music({ onPlayingChange }) {
 }
 
 // Each route gets its own formation in the point cloud behind the content.
-const SHAPE_FOR = { home: 'person', research: 'helix', music: 'waves' }
+const SHAPE_FOR = {
+  home: 'person',
+  work: 'computer',
+  research: 'helix',
+  music: 'waves',
+  about: 'phone',
+}
+
+const PAGE_TITLE = {
+  work: 'Work',
+  research: 'Research & Awards',
+  music: 'Music',
+  about: 'About',
+}
+
+const ROUTES = ['work', 'research', 'music', 'about']
 
 export default function App() {
   const hash = useHashRoute()
-  const page = (hash.startsWith('#research') || hash.startsWith('#awards'))
-    ? 'research'
-    : hash.startsWith('#music') ? 'music' : 'home'
+  const slug = hash.replace(/^#\/?/, '')
+  const page = ROUTES.includes(slug) ? slug : 'home'
   const [booting, setBooting] = useState(true)
   const [playing, setPlaying] = useState(false)
   const onPlayingChange = useCallback((v) => setPlaying(v), [])
@@ -394,13 +399,11 @@ export default function App() {
     if (!booting) document.body.style.overflow = ''
   }, [booting])
 
-  // Scroll to the target section after a page/hash change
+  // Every hash is now a route rather than an in-page anchor, so a route change
+  // always starts at the top of the new page.
   useEffect(() => {
-    const id = hash.slice(1)
-    if (!id || id === 'top') { window.scrollTo({ top: 0 }); return }
-    const el = document.getElementById(id)
-    if (el) el.scrollIntoView({ behavior: 'smooth' })
-  }, [hash, page])
+    window.scrollTo({ top: 0 })
+  }, [page])
 
   // Scroll-reveal for sections (with a fail-safe so content can never stay hidden)
   useEffect(() => {
@@ -426,31 +429,20 @@ export default function App() {
       <Particles shape={SHAPE_FOR[page] || 'scatter'} playing={playing} />
       <CursorFX />
       <Nav page={page} />
-      {page === 'research' ? (
+      {page === 'home' ? (
         <main className="container">
-          <div className="page-intro">
-            <a href="#top" className="page-back">← Back to home</a>
-            <h1 className="page-title">Research & Awards</h1>
-          </div>
-          <Research />
-          <Awards />
-        </main>
-      ) : page === 'music' ? (
-        <main className="container">
-          <div className="page-intro">
-            <a href="#top" className="page-back">← Back to home</a>
-            <h1 className="page-title">Music</h1>
-          </div>
-          <Music onPlayingChange={onPlayingChange} />
+          <Hero ready={!booting} />
         </main>
       ) : (
         <main className="container">
-          <Hero ready={!booting} />
-          <About />
-          <Education />
-          <Experience />
-          <Projects />
-          <Contact />
+          <div className="page-intro">
+            <a href="#top" className="page-back">← Back to home</a>
+            <h1 className="page-title">{PAGE_TITLE[page]}</h1>
+          </div>
+          {page === 'work' && <><Projects /><Experience /><Education /></>}
+          {page === 'research' && <><Research /><Awards /></>}
+          {page === 'music' && <Music onPlayingChange={onPlayingChange} />}
+          {page === 'about' && <><About /><Contact /></>}
         </main>
       )}
     </>
