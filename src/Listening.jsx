@@ -21,15 +21,31 @@ export default function Listening({ onPlayingChange }) {
 
   useEffect(() => {
     let alive = true
-    fetch('listening.json', { cache: 'no-cache' })
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('missing'))))
-      .then((d) => {
-        if (!alive) return
-        if (!d || !d.ok) return setState({ status: 'empty' })
-        setState({ status: 'ok', data: d })
-      })
-      .catch(() => alive && setState({ status: 'empty' }))
-    return () => { alive = false }
+
+    const load = () =>
+      // GitHub Pages serves this with Cache-Control: max-age=600, so without a
+      // unique URL the browser will happily show a ten-minute-old track. The
+      // timestamp defeats that; no-store stops it being cached on the way back.
+      fetch(`listening.json?t=${Date.now()}`, { cache: 'no-store' })
+        .then((r) => (r.ok ? r.json() : Promise.reject(new Error('missing'))))
+        .then((d) => {
+          if (!alive) return
+          if (!d || !d.ok) return setState({ status: 'empty' })
+          setState({ status: 'ok', data: d })
+        })
+        .catch(() => alive && setState((s) => (s.status === 'ok' ? s : { status: 'empty' })))
+
+    load()
+    // A page left open should pick up new snapshots without a refresh.
+    const id = setInterval(load, 60_000)
+    const onFocus = () => load()
+    window.addEventListener('focus', onFocus)
+
+    return () => {
+      alive = false
+      clearInterval(id)
+      window.removeEventListener('focus', onFocus)
+    }
   }, [])
 
   const d = state.data

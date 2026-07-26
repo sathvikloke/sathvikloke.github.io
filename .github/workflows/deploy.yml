@@ -4,9 +4,10 @@ on:
   push:
     branches: [main]
   schedule:
-    # Refreshes the listening data. GitHub runs scheduled jobs late under load,
-    # so treat this as "roughly every 20-40 minutes", not a guarantee.
-    - cron: '*/20 * * * *'
+    # Refreshes the listening data. 5 minutes is GitHub's practical floor, and
+    # scheduled jobs still run late under load, so expect 5-20 minutes in
+    # practice rather than a guarantee.
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 permissions:
