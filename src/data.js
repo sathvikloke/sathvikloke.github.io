@@ -55,22 +55,22 @@ export const projects = [
 // Research work (Research section)
 export const research = [
   {
-    title: 'Cohort-stratified prioritization of CRISPR–Cas9 sgRNAs for HDR-mediated correction of TP53 hotspot codons in ovarian, pancreatic, and colorectal cancer',
-    authors: 'S. Loke, N. Movva, M. Hota',
+    title: 'Cohort-stratified prioritization of CRISPR–Cas9 sgRNAs for HDR-mediated correction of TP53 hotspot codons in cancer',
+    authors: 'S. Loke*, N. S. V. Movva, M. Hota',
     venue: 'bioRxiv preprint',
     year: '2026',
     description: 'TP53 is mutated in roughly half of all human cancers. We prioritize CRISPR–Cas9 sgRNAs for HDR-mediated correction of recurrent TP53 hotspot codons, stratified across ovarian, pancreatic, and colorectal cancer cohorts.',
     tags: ['CRISPR', 'Genomics', 'Cancer'],
-    link: '',
+    link: 'https://www.biorxiv.org/content/10.64898/2026.05.20.726726v1',
   },
   {
     title: 'DriftScore: An Anchor-Relative Metric for Detecting Quality Drift in Multi-Turn Multimodal Generation',
-    authors: 'S. Loke, N. Movva, R. Gudepu, N. Mburu',
+    authors: 'S. Loke*, N. Movva, R. Gudepu, N. Mburu',
     venue: 'EvalMG @ ACM SIGIR 2026 (Accepted)',
     year: '2026',
     description: 'Iterative multimodal generation degrades output quality in ways standard No-Reference Image Quality Assessment metrics fail to track. We propose DriftScore, an anchor-relative, trajectory-aware metric that measures quality drift against the original generation.',
     tags: ['Multimodal', 'NR-IQA', 'Deep Learning'],
-    link: '',
+    link: 'https://openreview.net/pdf?id=S6a4Gg4Z7J',
   },
   {
     title: "Advancing Parkinson's Disease Management: From Dopaminergic Therapy to Deep Brain Stimulation and Beyond",
@@ -79,7 +79,7 @@ export const research = [
     year: '2026',
     description: "A published narrative review of modern diagnostic and therapeutic strategies for Parkinson's disease, spanning dopaminergic therapy, deep brain stimulation, and biomarker-driven early detection within a biological, economic, and psychosocial framework.",
     tags: ['Neuroscience', 'Deep Brain Stimulation', 'Published'],
-    link: '',
+    link: 'https://www.journalresearchhs.org/_files/ugd/ebf144_bc660d3935cc4f5597a3bfe3c31d5c48.pdf',
   },
 ]
 

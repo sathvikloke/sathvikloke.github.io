@@ -315,6 +315,7 @@ function Research() {
           </article>
         ))}
       </div>
+      <p className="paper__note">* corresponding author</p>
     </Section>
   )
 }

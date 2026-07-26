@@ -237,6 +237,13 @@ body.reveal-ready .section.is-visible { opacity: 1; transform: none; }
   margin: 0 0 12px; color: var(--accent); font-size: 0.78rem;
   text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;
 }
+.paper__note{
+  margin: 18px 0 0;
+  font-size: .74rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
 .paper__desc { margin: 0 0 14px; color: var(--muted); }
 
 /* Tags */

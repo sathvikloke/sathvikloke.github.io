@@ -3,6 +3,10 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  schedule:
+    # Refreshes the listening data. GitHub runs scheduled jobs late under load,
+    # so treat this as "roughly every 20-40 minutes", not a guarantee.
+    - cron: '*/20 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -23,6 +27,17 @@ jobs:
         with:
           node-version: 20
       - run: npm install
+
+      # Writes public/listening.json, which Vite copies into dist/.
+      # Deliberately non-fatal: a Last.fm outage must never block a deploy of
+      # the rest of the site, and the page already handles missing data honestly.
+      - name: Fetch listening data
+        continue-on-error: true
+        env:
+          LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
+          LASTFM_USER: ${{ secrets.LASTFM_USER }}
+        run: node scripts/fetch-listening.mjs
+
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:
