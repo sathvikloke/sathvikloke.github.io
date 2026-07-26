@@ -90,24 +90,45 @@ function drawPhone(g, S) {
 }
 
 const helixPt = (i, N) => {
-  const t = (i / N) * Math.PI * 11
-  const off = i % 2 ? Math.PI : 0
-  const r = 0.4
-  if (i % 14 === 0) {
-    const f = (i / 14) % 1
-    return [Math.cos(t + off) * r * (1 - 2 * f), (i / N - 0.5) * 2.1, Math.sin(t + off) * r * (1 - 2 * f)]
+  // 3.2 turns rather than 5.5: at this point count more turns blur the two
+  // strands into a tube instead of reading as a helix.
+  const TURNS = 3.2
+  const RADIUS = 0.5
+  const RUNG_EVERY = 9
+
+  if (i % RUNG_EVERY === 0) {
+    const step = Math.floor(i / RUNG_EVERY)
+    const rungs = Math.max(1, Math.floor(N / RUNG_EVERY))
+    const v = step / rungs
+    const a = v * Math.PI * 2 * TURNS
+    const f = ((step % 5) / 4) * 2 - 1 // -1..1 across the base pair
+    return [Math.cos(a) * RADIUS * f, (v - 0.5) * 2.1, Math.sin(a) * RADIUS * f]
   }
-  return [Math.cos(t + off) * r, (i / N - 0.5) * 2.1, Math.sin(t + off) * r]
+
+  const v = i / N
+  const a = v * Math.PI * 2 * TURNS + (i % 2 ? Math.PI : 0)
+  return [Math.cos(a) * RADIUS, (v - 0.5) * 2.1, Math.sin(a) * RADIUS]
 }
 
-const wavesPt = (i) => {
-  const cols = 74
-  const c = i % cols
+const wavesPt = (i, N) => {
+  // Discrete vertical bars, the way an audio waveform actually looks. The
+  // previous version scattered points through the envelope, which read as a
+  // cloud rather than as sound.
+  const cols = 96
+  const perCol = Math.max(1, Math.floor(N / cols))
+  const c = Math.floor(i / perCol) % cols
+  const k = i % perCol
   const u = c / (cols - 1)
-  const env = Math.sin(u * Math.PI)
-  const amp = env * (0.3 + 0.58 * Math.abs(Math.sin(u * 9.1) * 0.6 + Math.sin(u * 23.7) * 0.4))
-  const span = (((i / cols) | 0) % 9) / 8
-  return [(u - 0.5) * 2.15, (span - 0.5) * 2 * amp, ((((i * 37) % 11) / 10) - 0.5) * 0.34]
+
+  const jag =
+    0.55 * Math.sin(u * 21.0) +
+    0.3 * Math.sin(u * 7.3 + 1.1) +
+    0.15 * Math.sin(u * 43.0)
+  const envelope = Math.sqrt(Math.sin(u * Math.PI)) // fade in and out at the ends
+  const h = (0.1 + 0.9 * Math.abs(jag)) * envelope
+
+  const t = perCol === 1 ? 0 : (k / (perCol - 1)) * 2 - 1 // -1..1 up the bar
+  return [(u - 0.5) * 2.35, t * h, (Math.random() - 0.5) * 0.08]
 }
 
 const scatterPt = (i, N) => {
@@ -149,7 +170,7 @@ export default function Particles({ shape = 'scatter', playing = false }) {
       else if (name === 'computer') pts = sampleDrawing(drawComputer, N)
       else if (name === 'phone') pts = sampleDrawing(drawPhone, N)
       else if (name === 'helix') pts = Array.from({ length: N }, (_, i) => helixPt(i, N))
-      else if (name === 'waves') pts = Array.from({ length: N }, (_, i) => wavesPt(i))
+      else if (name === 'waves') pts = Array.from({ length: N }, (_, i) => wavesPt(i, N))
       else pts = Array.from({ length: N }, (_, i) => scatterPt(i, N))
       cache[name] = pts
       return pts
