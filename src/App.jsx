@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { profile, about, skills, education, projects, research, experience, awards, socials } from './data'
+import Particles from './Particles'
+import Listening from './Listening'
 
 // Bold the site owner's name within an author list
 function Authors({ value }) {
@@ -140,11 +142,17 @@ function Nav({ page }) {
         ['#research', 'Research'],
         ['#awards', 'Awards'],
       ]
+    : page === 'music'
+    ? [
+        ['#top', '← Home'],
+        ['#music', 'Music'],
+      ]
     : [
         ['#about', 'About'],
         ['#experience', 'Experience'],
         ['#projects', 'Projects'],
         ['#research', 'Research & Awards'],
+        ['#music', 'Music'],
         ['#contact', 'Contact'],
       ]
   return (
@@ -353,10 +361,29 @@ function Contact() {
   )
 }
 
+function Music({ onPlayingChange }) {
+  return (
+    <Section id="music" title="Music">
+      <p className="contact__lead">
+        I'm a huge music fan, and I play cello for patients in a memory care unit.
+        Both of those are more me than any of the papers.
+      </p>
+      <Listening onPlayingChange={onPlayingChange} />
+    </Section>
+  )
+}
+
+// Each route gets its own formation in the point cloud behind the content.
+const SHAPE_FOR = { home: 'person', research: 'helix', music: 'waves' }
+
 export default function App() {
   const hash = useHashRoute()
-  const page = (hash.startsWith('#research') || hash.startsWith('#awards')) ? 'research' : 'home'
+  const page = (hash.startsWith('#research') || hash.startsWith('#awards'))
+    ? 'research'
+    : hash.startsWith('#music') ? 'music' : 'home'
   const [booting, setBooting] = useState(true)
+  const [playing, setPlaying] = useState(false)
+  const onPlayingChange = useCallback((v) => setPlaying(v), [])
 
   useEffect(() => {
     document.title = `${profile.name} · Portfolio`
@@ -396,6 +423,7 @@ export default function App() {
   return (
     <>
       {booting && <Intro onFinish={() => setBooting(false)} />}
+      <Particles shape={SHAPE_FOR[page] || 'scatter'} playing={playing} />
       <CursorFX />
       <Nav page={page} />
       {page === 'research' ? (
@@ -406,6 +434,14 @@ export default function App() {
           </div>
           <Research />
           <Awards />
+        </main>
+      ) : page === 'music' ? (
+        <main className="container">
+          <div className="page-intro">
+            <a href="#top" className="page-back">← Back to home</a>
+            <h1 className="page-title">Music</h1>
+          </div>
+          <Music onPlayingChange={onPlayingChange} />
         </main>
       ) : (
         <main className="container">
