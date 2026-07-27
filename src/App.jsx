@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { flushSync } from 'react-dom'
 import { profile, about, skills, education, projects, research, experience, awards, socials } from './data'
 import Particles from './Particles'
 import Listening from './Listening'
@@ -22,7 +23,20 @@ function Authors({ value }) {
 function useHashRoute() {
   const [hash, setHash] = useState(() => window.location.hash)
   useEffect(() => {
-    const on = () => setHash(window.location.hash)
+    const on = () => {
+      const next = window.location.hash
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+      // The View Transitions API snapshots the page, runs this callback, then
+      // animates old -> new. React batches state updates asynchronously, so the
+      // DOM must be flushed inside the callback or the snapshot captures the
+      // old page twice and nothing appears to change.
+      if (document.startViewTransition && !reduce) {
+        document.startViewTransition(() => flushSync(() => setHash(next)))
+      } else {
+        setHash(next)
+      }
+    }
     window.addEventListener('hashchange', on)
     return () => window.removeEventListener('hashchange', on)
   }, [])

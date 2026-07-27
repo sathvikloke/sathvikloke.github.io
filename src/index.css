@@ -414,3 +414,50 @@ body.reveal-ready .section.is-visible { opacity: 1; transform: none; }
   .reveal-el, body.reveal-ready .section { opacity: 1; transform: none; }
   .listen__eq i { height: 60%; }
 }
+
+/* ── view transitions ────────────────────────────────────────
+   Native View Transitions API (Chrome 111+, Safari 18+, Firefox 144+
+   — about 88% of users). Everywhere else the route swap is instant,
+   exactly as it was before, because the JS feature-detects.
+   ──────────────────────────────────────────────────────────── */
+
+/* The page content lifts and unblurs. Out is quicker than in, so the
+   incoming page leads rather than the two crossing in the middle. */
+::view-transition-old(root) { animation: vt-out .30s var(--e) both; }
+::view-transition-new(root) { animation: vt-in  .52s var(--e) both; }
+
+@keyframes vt-out {
+  to { opacity: 0; transform: translateY(-14px); filter: blur(6px); }
+}
+@keyframes vt-in {
+  from { opacity: 0; transform: translateY(24px); filter: blur(9px); }
+}
+
+/* The heading is the same object on every route, so name it once and the
+   browser morphs it between positions and sizes instead of cross-fading.
+   These two never appear together, so they can share a name. */
+.hero__name,
+.page-title { view-transition-name: page-heading; }
+
+::view-transition-group(page-heading) { animation-duration: .58s; }
+::view-transition-old(page-heading),
+::view-transition-new(page-heading) { animation-duration: .58s; }
+
+/* Fixed chrome that genuinely persists across routes gets captured
+   separately and held still — otherwise it cross-fades against itself
+   and the particle cloud ghosts. */
+.field { view-transition-name: field; }
+.nav   { view-transition-name: nav; }
+
+::view-transition-old(field), ::view-transition-new(field),
+::view-transition-old(nav),   ::view-transition-new(nav) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root), ::view-transition-new(root),
+  ::view-transition-old(page-heading), ::view-transition-new(page-heading) {
+    animation: none;
+  }
+}
