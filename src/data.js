@@ -105,10 +105,8 @@ export const research = [
 export const experience = [
   {
     role: 'Researcher',
-    company: 'Colorado State University',
-    // TODO(sathvik): add the start date, e.g. 'Jul 2026 – Present'.
-    // Left blank rather than guessed — the component omits it cleanly.
-    period: '',
+    company: 'Colorado State University \u00b7 Remote',
+    period: 'Jun 2026 \u2013 Present',
     bullets: [
       'Researching optimizers in machine learning.',
     ],
