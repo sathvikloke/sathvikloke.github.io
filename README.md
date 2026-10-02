@@ -2,7 +2,7 @@
 
 # sathvikloke.github.io
 
-**A personal site written on a page of ruled lab notebook: two pages, a signature that writes itself, and a music page fed by real listening data.**
+**A plain white personal site: one centered column, a signature that writes itself, and a music page fed by real listening data.**
 
 [![Live](https://img.shields.io/badge/LIVE-sathvikloke.github.io-2b4c8c?style=for-the-badge)](https://sathvikloke.github.io)
 [![React](https://img.shields.io/badge/React-18.3-f4f7fb?style=for-the-badge&logo=react&logoColor=2b4c8c)](https://react.dev)
@@ -23,23 +23,17 @@ Both are real URLs. [`vite.config.js`](vite.config.js) builds one HTML entry per
 
 Zero runtime dependencies beyond React.
 
-## The paper
+## Layout
 
-[`src/index.css`](src/index.css) draws the notebook with two CSS gradients on `.sheet`: repeating horizontal rules, and one pink margin rule near the left edge. Like a real page, the writing starts just right of the margin and the lines run off to the right on wide screens.
-
-**Everything sits on a baseline grid.** Every line box is exactly `--line` (30px) tall and every gap is a whole number of lines, so the text stays on the rules all the way down. Three things keep it that way, written down so they don't regress:
-
-- **No spacing that isn't a multiple of `--line`.** One stray `margin: 8px` and everything below it floats between the lines.
-- **Inline text in another font gets `line-height: 0`.** The printed labels (`DATE`, `SIGNED`, `PAGE`) and the handwritten date have different font metrics from the body. At the normal line height they stretch their line box by a few pixels and knock the footer off the rules. Put the `0` *inside* the `font` shorthand, because a shorthand declared later resets any separate `line-height`.
-- **`--rule-offset` is measured, not guessed.** It lifts each rule to the body font's baseline, which sits 19px into each 30px line for Newsreader at 18px. Change the font or size and re-measure. Prepend a zero-size `inline-block` with `vertical-align: baseline` to a paragraph and read its offset.
+[`src/index.css`](src/index.css) is one column, at most 600px wide, centered on a white page both horizontally and vertically. The `.sheet` uses `min-height` rather than `height`, so a page taller than the window, like the music page on a phone, grows and scrolls instead of being clipped. Text is left-aligned inside the column, set in Newsreader at 18px on a 30px line, with gaps in whole or half lines.
 
 ## The signature
 
 [`src/Signature.jsx`](src/Signature.jsx) is a hand-drawn signature, not a font. Each `<path>` is one pen stroke in writing order: S, athvik, the t-cross, the i-dot, then Loke and the underline. The strokes were plotted as points and smoothed with Catmull-Rom splines.
 
-It writes itself the first time it scrolls into view. Every path has `pathLength="1"`, so a dash of 1 is the whole stroke, and `stroke-dashoffset` animates from just past 1 down to 0. Each stroke's start time and duration are set so the pen moves at a constant speed, with a short pause at each lift. It's about 3 seconds in total. The resting offset is `1.02` rather than `1`, so the round line caps can't leave a dot at the start of each stroke before it's drawn.
+It writes itself the first time it scrolls into view. Every path has `pathLength="1"`, so a dash of 1 is the whole stroke, and `stroke-dashoffset` animates from 1 down to 0. Each stroke's start time and duration are set so the pen moves at a constant speed, with a short pause at each lift. It's about 3 seconds in total.
 
-The wrapper is zero-height on the text baseline and the SVG hangs from it, so the signature rises across the lines above, the way a real one would, without moving the grid.
+**Every stroke stays at `opacity: 0` until its own start time.** A fully offset dash still paints its round line cap, and on short strokes like the i-dot and the t-cross that cap was a visible stray dot while it waited. The keyframes set opacity to 1, and the animation uses `forwards` rather than `both` so the hidden base style holds during each delay.
 
 ## How the music works
 
@@ -89,9 +83,9 @@ The repo is named `sathvikloke.github.io`, which serves from the root, so `vite.
 
 | | |
 |---|---|
-| JS | 152 kB raw, **49.7 kB gzipped** (almost all of it React) |
-| CSS | 2.6 kB raw, **1.2 kB gzipped** |
-| Webfonts | Newsreader (body) and Caveat (handwritten date), from Google Fonts |
+| JS | 151 kB raw, **49.6 kB gzipped** (almost all of it React) |
+| CSS | 1.8 kB raw, **0.8 kB gzipped** |
+| Webfonts | Newsreader, from Google Fonts |
 
 ## Accessibility
 

@@ -1,27 +1,12 @@
-/*
-  A page of ruled lab notebook. Everything sits on a baseline grid: every line
-  box is exactly --line tall and every gap is a whole number of lines, so the
-  text stays on the rules all the way down. Don't add a margin, padding or
-  border that isn't a multiple of --line, or the writing drifts off the lines.
-*/
-
 :root {
   --line: 30px;
-  --rule-offset: -10px;     /* lifts each rule up to the text baseline */
   --col: 600px;
-  /* Like a real page, the margin rule sits near the left edge and the writing
-     starts just after it; the lines run off to the right on wide screens. */
-  --margin-x: clamp(26px, 8vw, 132px);
-  --gap: clamp(18px, 3vw, 44px);
 
-  --paper: #fffffd;
-  --rule: #d9e5f1;
-  --margin-rule: #eba3a3;
-  --printed: #8aa6c6;       /* the notebook's own printed labels */
+  --paper: #fff;
   --ink: #23262d;
   --ink-soft: #6b717c;
-  --pen: #2b4c8c;           /* blue ballpoint, for the date and signature */
-  --red-pen: #c2402f;
+  --pen: #2b4c8c;           /* blue ballpoint, for the signature */
+  --accent: #c2402f;
 }
 
 * { box-sizing: border-box; }
@@ -36,23 +21,18 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* One column in the middle of the screen. min-height, not height, so a page
+   taller than the window grows and scrolls instead of being clipped. */
 .sheet {
   min-height: 100vh;
-  background:
-    linear-gradient(90deg,
-      transparent calc(var(--margin-x) - 1px),
-      var(--margin-rule) 0 var(--margin-x),
-      transparent 0),
-    repeating-linear-gradient(
-      transparent 0 calc(var(--line) - 1px),
-      var(--rule) 0 var(--line));
-  background-position: 0 0, 0 var(--rule-offset);
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--line) * 2) 20px;
 }
 
-.col {
-  max-width: calc(var(--margin-x) + var(--gap) + var(--col) + 20px);
-  padding: calc(var(--line) * 2) 20px calc(var(--line) * 2) calc(var(--margin-x) + var(--gap));
-}
+.col { width: 100%; max-width: var(--col); }
 
 p, ul { margin: 0 0 var(--line); }
 p.tight { margin-bottom: 0; }
@@ -69,63 +49,26 @@ a {
   text-decoration-color: color-mix(in srgb, var(--ink) 35%, transparent);
   transition: text-decoration-color 120ms;
 }
-a:hover { text-decoration-color: var(--red-pen); }
+a:hover { text-decoration-color: var(--accent); }
 
 .soft { color: var(--ink-soft); }
 .lc { text-transform: lowercase; }
 /* Song and artist lists would be a wall of underlines; show them on hover. */
 .lc a { text-decoration-color: transparent; }
-.lc a:hover { text-decoration-color: var(--red-pen); }
-
-.row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 0 1em;
-  flex-wrap: wrap;
-}
-.row > * { white-space: nowrap; }
+.lc a:hover { text-decoration-color: var(--accent); }
 
 header { margin-bottom: var(--line); }
 nav { color: var(--ink-soft); }
 nav span { color: var(--ink); }
 
 footer { margin-top: calc(var(--line) * 2); }
-footer p { margin: 0 0 var(--line); }
+footer p { margin: 0 0 calc(var(--line) / 2); }
 
-/* The labels and handwriting are a different font from the body, and would
-   stretch their line box and knock everything below off the rules. Their
-   line-height of 0 (in the font shorthand) lets the body set it alone. */
-.printed {
-  font: 500 11px/0 system-ui, -apple-system, 'Helvetica Neue', sans-serif;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--printed);
-}
-
-.hand {
-  font: 500 22px/0 'Caveat', 'Bradley Hand', cursive;
-  color: var(--pen);
-  padding: 0 0.3em;
-}
-
-/* The signature overflows upward across the lines above, like a real one.
-   The wrapper is zero-height on the baseline so it never moves the grid; the
-   svg hangs from it with the signature's baseline (y=70 of 92) on the rule. */
-.sig {
-  --w: 185px;
-  position: relative;
-  display: inline-block;
-  width: var(--w);
-  height: 0;
-  margin-left: 0.6em;
-}
+.sig { display: block; width: 185px; }
 .sig__ink {
-  position: absolute;
-  left: 0;
-  top: calc(var(--w) * -70 / 250);
-  width: var(--w);
-  height: calc(var(--w) * 92 / 250);
+  display: block;
+  width: 100%;
+  height: auto;
   overflow: visible;
 }
 .sig__ink path {
@@ -135,8 +78,14 @@ footer p { margin: 0 0 var(--line); }
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-/* pathLength=1 on each stroke, so a dash of 1 is the whole stroke. */
+/* pathLength=1 on each stroke, so a dash of 1 is the whole stroke. Strokes
+   stay at opacity 0 until their own start time: a hidden dash still paints its
+   round cap, which left a stray dot where short strokes (the i-dot, t-cross)
+   begin. `forwards` alone (not `both`) keeps them hidden during the delay. */
 .sig__ink--waiting path,
-.sig__ink--writing path { stroke-dasharray: 1 2; stroke-dashoffset: 1.02; }
+.sig__ink--writing path { stroke-dasharray: 1 2; stroke-dashoffset: 1; opacity: 0; }
 .sig__ink--writing path { animation: ink var(--dur) var(--at) cubic-bezier(.45, .05, .55, .95) forwards; }
-@keyframes ink { to { stroke-dashoffset: 0; } }
+@keyframes ink {
+  from { opacity: 1; stroke-dashoffset: 1; }
+  to { opacity: 1; stroke-dashoffset: 0; }
+}

@@ -1,6 +1,6 @@
 # Product
 
-> **Superseded October 2026.** This brief describes the earlier dark particle-cloud site. Sathvik has since redesigned it as a white, ruled lab-notebook page in a lowercase voice, with two pages (home and `/music/`). The "dark ground is binding" constraint below no longer applies, and neither does the content inventory. See the README for the current design.
+> **Superseded October 2026.** This brief describes the earlier dark particle-cloud site. Sathvik has since redesigned it as a plain white page with one centered column in a lowercase voice, with two pages (home and `/music/`). The "dark ground is binding" constraint below no longer applies, and neither does the content inventory. See the README for the current design.
 
 <!-- impeccable:product-schema 1 -->
 

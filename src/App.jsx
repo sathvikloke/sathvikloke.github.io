@@ -4,10 +4,6 @@ import Signature from './Signature'
 
 const onMusic = window.location.pathname.startsWith('/music')
 
-const today = new Date()
-  .toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-  .toLowerCase()
-
 // Renders "[text](url)" spans in data.js strings as links.
 function Inline({ text }) {
   const parts = text.split(/\[([^\]]+)\]\(([^)]+)\)/)
@@ -94,13 +90,12 @@ export default function App() {
   return (
     <div className="sheet">
       <div className="col">
-        <header className="row">
+        <header>
           <nav>
             {onMusic ? <a href="/">home</a> : <span>home</span>}
             {' · '}
             {onMusic ? <span>music</span> : <a href="/music/">music</a>}
           </nav>
-          <span><span className="printed">date</span> <span className="hand">{today}</span></span>
         </header>
 
         <main>{onMusic ? <Music /> : <Home />}</main>
@@ -111,10 +106,7 @@ export default function App() {
               <span key={c.href}>{i > 0 && ' · '}<a href={c.href}>{c.label}</a></span>
             ))}
           </p>
-          <div className="row">
-            <span><span className="printed">signed</span><Signature /></span>
-            <span><span className="printed">page</span> <span className="hand">{onMusic ? 2 : 1}</span></span>
-          </div>
+          <Signature />
         </footer>
       </div>
     </div>
