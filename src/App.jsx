@@ -1,464 +1,122 @@
-import { useState, useEffect, useCallback } from 'react'
-import { flushSync } from 'react-dom'
-import { profile, about, skills, education, projects, research, experience, awards, socials } from './data'
-import Particles from './Particles'
-import Listening from './Listening'
+import { intro, thingsHeading, things, music, contact } from './data'
+import { useListening, ago } from './Listening'
+import Signature from './Signature'
 
-// Bold the site owner's name within an author list
-function Authors({ value }) {
-  const me = 'S. Loke'
-  const parts = value.split(me)
+const onMusic = window.location.pathname.startsWith('/music')
+
+const today = new Date()
+  .toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  .toLowerCase()
+
+// Renders "[text](url)" spans in data.js strings as links.
+function Inline({ text }) {
+  const parts = text.split(/\[([^\]]+)\]\(([^)]+)\)/)
+  const out = []
+  for (let i = 0; i < parts.length; i += 3) {
+    if (parts[i]) out.push(parts[i])
+    if (i + 1 < parts.length) out.push(<a key={i} href={parts[i + 2]}>{parts[i + 1]}</a>)
+  }
+  return out
+}
+
+function Track({ t, live }) {
   return (
-    <p className="paper__authors">
-      {parts.map((p, i) => (
-        <span key={i}>
-          {p}
-          {i < parts.length - 1 && <strong>{me}</strong>}
-        </span>
-      ))}
-    </p>
+    <span className="lc">
+      <a href={t.url || undefined}>{t.track}</a>, {t.artist}
+      <span className="soft"> · {live ? 'now' : ago(t.at)}</span>
+    </span>
   )
 }
 
-function useHashRoute() {
-  const [hash, setHash] = useState(() => window.location.hash)
-  useEffect(() => {
-    const on = () => {
-      const next = window.location.hash
-      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-      // The View Transitions API snapshots the page, runs this callback, then
-      // animates old -> new. React batches state updates asynchronously, so the
-      // DOM must be flushed inside the callback or the snapshot captures the
-      // old page twice and nothing appears to change.
-      if (document.startViewTransition && !reduce) {
-        document.startViewTransition(() => flushSync(() => setHash(next)))
-      } else {
-        setHash(next)
-      }
-    }
-    window.addEventListener('hashchange', on)
-    return () => window.removeEventListener('hashchange', on)
-  }, [])
-  return hash
-}
-
-function CursorFX() {
-  useEffect(() => {
-    if (window.matchMedia('(pointer: coarse)').matches) return
-    const glow = document.createElement('div')
-    glow.className = 'cursor-glow'
-    const ring = document.createElement('div')
-    ring.className = 'cursor-ring'
-    document.body.append(glow, ring)
-
-    let mx = innerWidth / 2, my = innerHeight / 2, rx = mx, ry = my
-    const onMove = (e) => {
-      mx = e.clientX; my = e.clientY
-      glow.style.transform = `translate(${mx}px, ${my}px)`
-    }
-    let raf
-    const loop = () => {
-      rx += (mx - rx) * 0.16; ry += (my - ry) * 0.16
-      ring.style.transform = `translate(${rx}px, ${ry}px)`
-      raf = requestAnimationFrame(loop)
-    }
-    const onOver = (e) => { if (e.target.closest('a, button')) ring.classList.add('is-active') }
-    const onOut = (e) => { if (e.target.closest('a, button')) ring.classList.remove('is-active') }
-
-    window.addEventListener('mousemove', onMove)
-    document.addEventListener('mouseover', onOver)
-    document.addEventListener('mouseout', onOut)
-    loop()
-    return () => {
-      cancelAnimationFrame(raf)
-      window.removeEventListener('mousemove', onMove)
-      document.removeEventListener('mouseover', onOver)
-      document.removeEventListener('mouseout', onOut)
-      glow.remove(); ring.remove()
-    }
-  }, [])
-  return null
-}
-
-function Intro({ onFinish }) {
-  const [lines, setLines] = useState([])
-  const [pct, setPct] = useState(0)
-  const [leaving, setLeaving] = useState(false)
-
-  useEffect(() => {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reduce) { onFinish(); return }
-
-    const script = [
-      '> initializing system…',
-      '> loading modules [ neuro · ml · imaging ]',
-      '> compiling portfolio.jsx',
-      '> establishing secure connection',
-      '> decrypting identity: SATHVIK LOKE',
-      '> ready.',
-    ]
-    document.body.style.overflow = 'hidden'
-
-    const timers = []
-    let li = 0
-    const addLine = () => {
-      const line = script[li]
-      if (line !== undefined) setLines((prev) => [...prev, line])
-      li += 1
-      if (li < script.length) timers.push(setTimeout(addLine, 220 + Math.random() * 160))
-    }
-    timers.push(setTimeout(addLine, 200))
-
-    const prog = setInterval(() => {
-      setPct((p) => Math.min(100, p + Math.random() * 11 + 3))
-    }, 120)
-
-    timers.push(setTimeout(() => {
-      clearInterval(prog)
-      setPct(100)
-      setLeaving(true)
-      timers.push(setTimeout(onFinish, 650))
-    }, 2000))
-
-    return () => {
-      timers.forEach(clearTimeout)
-      clearInterval(prog)
-      document.body.style.overflow = ''
-    }
-  }, [])
-
-  const lineClass = (l = '') =>
-    l.includes('SATHVIK') ? 'intro__line intro__line--id'
-      : l.includes('ready') ? 'intro__line intro__line--ok'
-      : 'intro__line'
-
-  return (
-    <div className={`intro ${leaving ? 'intro--leave' : ''}`} aria-hidden="true">
-      <div className="intro__scan" />
-      <div className="intro__inner">
-        <div className="intro__log">
-          {lines.map((l, i) => <div key={i} className={lineClass(l)}>{l}</div>)}
-          <span className="intro__cursor">▋</span>
-        </div>
-        <div className="intro__bar"><div className="intro__fill" style={{ width: `${pct}%` }} /></div>
-        <div className="intro__pct">{Math.floor(pct)}%</div>
-      </div>
-    </div>
-  )
-}
-
-// One short, stable set of destinations. The old nav listed six section
-// anchors, which wrapped onto two lines and collided with the wordmark.
-const NAV = [
-  ['#work', 'Work'],
-  ['#research', 'Research'],
-  ['#music', 'Music'],
-  ['#about', 'About'],
-]
-
-function Nav({ page }) {
-  const [open, setOpen] = useState(false)
-  const links = NAV
-  return (
-    <header className="nav">
-      <a href="#top" className="nav__brand">{profile.name}</a>
-      <button className="nav__toggle" aria-label="Toggle menu" onClick={() => setOpen((o) => !o)}>
-        <span /><span /><span />
-      </button>
-      <nav className={`nav__links ${open ? 'is-open' : ''}`}>
-        {links.map(([href, label]) => (
-          <a key={href} href={href} onClick={() => setOpen(false)}>{label}</a>
-        ))}
-      </nav>
-    </header>
-  )
-}
-
-function Hero({ ready }) {
-  const fullName = `${profile.name}.`
-  const [typed, setTyped] = useState('')
-  const [done, setDone] = useState(false)
-
-  useEffect(() => {
-    if (!ready) return
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reduce) { setTyped(fullName); setDone(true); return }
-    let i = 0
-    const id = setInterval(() => {
-      i += 1
-      setTyped(fullName.slice(0, i))
-      if (i >= fullName.length) {
-        clearInterval(id)
-        setTimeout(() => setDone(true), 350)
-      }
-    }, 90)
-    return () => clearInterval(id)
-  }, [ready])
-
-  const reveal = (base, delay) => ({
-    className: `${base} reveal-el ${done ? 'is-in' : ''}`,
-    style: { transitionDelay: done ? delay : '0s' },
-  })
-
-  return (
-    <section id="top" className="hero">
-      <p className="hero__eyebrow">{profile.role}</p>
-      <h1 className="hero__name" aria-label={fullName}>
-        <span>{typed}</span><span className={`caret ${done ? 'caret--idle' : ''}`} aria-hidden="true" />
-      </h1>
-      <p {...reveal('hero__sub', '0.05s')}>{profile.subhead}</p>
-      <p {...reveal('hero__tagline', '0.15s')}>{profile.tagline}</p>
-      <div {...reveal('hero__actions', '0.25s')}>
-        <a className="btn btn--primary" href="#research">The research</a>
-        <a className="btn" href="#work">What I've built</a>
-        <a className="btn" href="#music">What I listen to</a>
-      </div>
-      <p {...reveal('hero__meta', '0.35s')}>{profile.location}</p>
-    </section>
-  )
-}
-
-function Section({ id, title, children }) {
-  return (
-    <section id={id} className="section">
-      <h2 className="section__title">{title}</h2>
-      {children}
-    </section>
-  )
-}
-
-function About() {
-  return (
-    <Section id="about" title="About">
-      <div className="about">
-        <div className="about__text">
-          {about.map((p, i) => <p key={i}>{p}</p>)}
-        </div>
-        <ul className="skills">
-          {skills.map((s) => <li key={s}>{s}</li>)}
-        </ul>
-      </div>
-    </Section>
-  )
-}
-
-function Education() {
-  return (
-    <Section id="education" title="Education">
-      <div className="timeline">
-        {education.map((e, i) => (
-          <div key={i} className="job">
-            <div className="job__head">
-              <h3 className="job__role">{e.school}</h3>
-              {e.period && <span className="job__period">{e.period}</span>}
-            </div>
-            {e.detail && <p className="job__company">{e.detail}</p>}
-          </div>
-        ))}
-      </div>
-    </Section>
-  )
-}
-
-function Experience() {
-  return (
-    <Section id="experience" title="Experience">
-      <div className="timeline">
-        {experience.map((job, i) => (
-          <div key={i} className="job">
-            <div className="job__head">
-              <h3 className="job__role">{job.role}</h3>
-              {job.period && <span className="job__period">{job.period}</span>}
-            </div>
-            <p className="job__company">{job.company}</p>
-            <ul className="job__bullets">
-              {job.bullets.map((b, j) => <li key={j}>{b}</li>)}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </Section>
-  )
-}
-
-function Projects() {
-  return (
-    <Section id="projects" title="Projects">
-      <div className="cards">
-        {projects.map((p) => (
-          <article key={p.title} className="card">
-            <h3 className="card__title">{p.title}</h3>
-            <p className="card__desc">{p.description}</p>
-            <ul className="tags">
-              {p.tags.map((t) => <li key={t}>{t}</li>)}
-            </ul>
-            {p.link && (
-              <a className="card__link" href={p.link} target="_blank" rel="noreferrer">
-                Visit site ↗
-              </a>
-            )}
-          </article>
-        ))}
-      </div>
-    </Section>
-  )
-}
-
-function Research() {
-  return (
-    <Section id="research" title="Research">
-      <div className="papers">
-        {research.map((r) => (
-          <article key={r.title} className="paper">
-            <div className="paper__head">
-              <h3 className="paper__title">
-                {r.link ? (
-                  <a href={r.link} target="_blank" rel="noreferrer">{r.title} ↗</a>
-                ) : r.title}
-              </h3>
-              {r.year && <span className="paper__year">{r.year}</span>}
-            </div>
-            {r.authors && <Authors value={r.authors} />}
-            {r.venue && <p className="paper__venue">{r.venue}</p>}
-            <p className="paper__desc">{r.description}</p>
-            <ul className="tags">
-              {r.tags.map((t) => <li key={t}>{t}</li>)}
-            </ul>
-          </article>
-        ))}
-      </div>
-      <p className="paper__note">* corresponding author</p>
-    </Section>
-  )
-}
-
-function Awards() {
-  return (
-    <Section id="awards" title="Awards & Honors">
-      <dl className="awards">
-        {awards.map((a, i) => (
-          <div key={i} className="awards__row">
-            <dt className="awards__title">{a.title}</dt>
-            <dd className="awards__detail">{a.detail}</dd>
-          </div>
-        ))}
-      </dl>
-    </Section>
-  )
-}
-
-function Contact() {
-  return (
-    <Section id="contact" title="Contact">
-      <p className="contact__lead">
-        Want to collaborate, talk research, or just say hi? Reach me here.
-      </p>
-      <ul className="contact__list">
-        {socials.map((s) => (
-          <li key={s.label}>
-            <span className="contact__label">{s.label}</span>
-            <a href={s.href} target="_blank" rel="noreferrer">{s.value}</a>
-          </li>
-        ))}
-      </ul>
-    </Section>
-  )
-}
-
-function Music({ onPlayingChange }) {
-  return (
-    <Section id="music" title="Music">
-      <p className="contact__lead">
-        I'm a huge music fan, and I play cello for patients in a memory care unit.
-        Both of those are more me than any of the papers.
-      </p>
-      <Listening onPlayingChange={onPlayingChange} />
-    </Section>
-  )
-}
-
-// Each route gets its own formation in the point cloud behind the content.
-const SHAPE_FOR = {
-  home: 'person',
-  work: 'computer',
-  research: 'helix',
-  music: 'waves',
-  about: 'phone',
-}
-
-const PAGE_TITLE = {
-  work: 'Work',
-  research: 'Research & Awards',
-  music: 'Music',
-  about: 'About',
-}
-
-const ROUTES = ['work', 'research', 'music', 'about']
-
-export default function App() {
-  const hash = useHashRoute()
-  const slug = hash.replace(/^#\/?/, '')
-  const page = ROUTES.includes(slug) ? slug : 'home'
-  const [booting, setBooting] = useState(true)
-  const [playing, setPlaying] = useState(false)
-  const onPlayingChange = useCallback((v) => setPlaying(v), [])
-
-  useEffect(() => {
-    document.title = `${profile.name} · Portfolio`
-  }, [])
-
-  // Safety: make sure scrolling is never left locked once the intro is gone
-  useEffect(() => {
-    if (!booting) document.body.style.overflow = ''
-  }, [booting])
-
-  // Every hash is now a route rather than an in-page anchor, so a route change
-  // always starts at the top of the new page.
-  useEffect(() => {
-    window.scrollTo({ top: 0 })
-  }, [page])
-
-  // Scroll-reveal for sections (with a fail-safe so content can never stay hidden)
-  useEffect(() => {
-    const els = document.querySelectorAll('.section')
-    const revealAll = () => els.forEach((el) => el.classList.add('is-visible'))
-
-    if (!('IntersectionObserver' in window)) { revealAll(); return }
-
-    document.body.classList.add('reveal-ready')
-    const obs = new IntersectionObserver((entries) => {
-      entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add('is-visible') })
-    }, { threshold: 0.05, rootMargin: '0px 0px 120px 0px' })
-    els.forEach((el) => obs.observe(el))
-
-    // Fail-safe: whatever happens, reveal everything within 1.5s
-    const fallback = setTimeout(revealAll, 1500)
-    return () => { obs.disconnect(); clearTimeout(fallback) }
-  }, [page])
+function Home() {
+  const { live, now, recent } = useListening()
+  const head = now ?? recent[0]
 
   return (
     <>
-      {booting && <Intro onFinish={() => setBooting(false)} />}
-      <Particles shape={SHAPE_FOR[page] || 'scatter'} playing={playing} />
-      <CursorFX />
-      <Nav page={page} />
-      {page === 'home' ? (
-        <main className="container">
-          <Hero ready={!booting} />
-        </main>
-      ) : (
-        <main className="container">
-          <div className="page-intro">
-            <a href="#top" className="page-back">← Back to home</a>
-            <h1 className="page-title">{PAGE_TITLE[page]}</h1>
-          </div>
-          {page === 'work' && <><Projects /><Experience /><Education /></>}
-          {page === 'research' && <><Research /><Awards /></>}
-          {page === 'music' && <Music onPlayingChange={onPlayingChange} />}
-          {page === 'about' && <><About /><Contact /></>}
-        </main>
+      {intro.map((p, i) => <p key={i}><Inline text={p} /></p>)}
+
+      <p className="tight">{thingsHeading}</p>
+      <ul>
+        {things.map((t, i) => <li key={i}><Inline text={t} /></li>)}
+      </ul>
+
+      {head && (
+        <p>
+          {live ? 'listening to: ' : 'last played: '}
+          <Track t={head} live={live} />
+          {' — '}<a href="/music/">more music</a>
+        </p>
       )}
     </>
+  )
+}
+
+function Music() {
+  const { status, live, now, recent, top } = useListening()
+
+  return (
+    <>
+      <p>music.</p>
+      {music.map((p, i) => <p key={i} className={i < music.length - 1 ? 'tight' : ''}><Inline text={p} /></p>)}
+
+      {status === 'empty' && <p className="soft">listening data isn't connected yet.</p>}
+
+      {(now || recent.length > 0) && (
+        <>
+          <p className="tight">{live ? 'listening to now, then recently:' : 'recently:'}</p>
+          <ul>
+            {now && <li><Track t={now} live /></li>}
+            {recent.map((t, i) => <li key={`${t.track}-${i}`}><Track t={t} /></li>)}
+          </ul>
+        </>
+      )}
+
+      {top.length > 0 && (
+        <>
+          <p className="tight">most played this month:</p>
+          <p>
+            {top.map((a, i) => (
+              <span key={a.name} className="lc">
+                {i > 0 && ' · '}
+                <a href={a.url || undefined}>{a.name}</a>
+                {a.plays > 0 && <span className="soft"> ({a.plays})</span>}
+              </span>
+            ))}
+          </p>
+        </>
+      )}
+    </>
+  )
+}
+
+export default function App() {
+  return (
+    <div className="sheet">
+      <div className="col">
+        <header className="row">
+          <nav>
+            {onMusic ? <a href="/">home</a> : <span>home</span>}
+            {' · '}
+            {onMusic ? <span>music</span> : <a href="/music/">music</a>}
+          </nav>
+          <span><span className="printed">date</span> <span className="hand">{today}</span></span>
+        </header>
+
+        <main>{onMusic ? <Music /> : <Home />}</main>
+
+        <footer>
+          <p>
+            {contact.map((c, i) => (
+              <span key={c.href}>{i > 0 && ' · '}<a href={c.href}>{c.label}</a></span>
+            ))}
+          </p>
+          <div className="row">
+            <span><span className="printed">signed</span><Signature /></span>
+            <span><span className="printed">page</span> <span className="hand">{onMusic ? 2 : 1}</span></span>
+          </div>
+        </footer>
+      </div>
+    </div>
   )
 }

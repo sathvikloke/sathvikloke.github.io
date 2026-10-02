@@ -46,7 +46,7 @@ if (!api_key || !user) {
 }
 
 const [recentRaw, topRaw] = await Promise.all([
-  call({ method: 'user.getrecenttracks', user, api_key, limit: '8', extended: '1' }),
+  call({ method: 'user.getrecenttracks', user, api_key, limit: '16', extended: '1' }),
   call({ method: 'user.gettopartists',   user, api_key, limit: '6', period: '1month' }),
 ]);
 
@@ -62,7 +62,7 @@ const payload = {
   ok: true,
   playing: Boolean(live),
   now: live ? shape(live) : null,
-  recent: list.filter(t => t !== live).map(shape).filter(t => t.track).slice(0, 6),
+  recent: list.filter(t => t !== live).map(shape).filter(t => t.track).slice(0, 15),
   top: (Array.isArray(artists) ? artists : []).map(a => ({
     name:  a.name ?? '',
     plays: Number(a.playcount ?? 0),
