@@ -16,10 +16,12 @@
 
 | Page | Contents |
 |---|---|
-| `/` | a short intro, the seven things he's proudest of, and the last song played |
+| `/` | a short intro, the things he's proudest of, and the last song played |
+| `/projects/` | previous projects: LANDER and Inclusion Health |
+| `/research/` | every paper, newest first, with venue and authors |
 | `/music/` | cello for hospice patients, @vikownsdabeat, recent songs and top artists from Last.fm |
 
-Both are real URLs. [`vite.config.js`](vite.config.js) builds one HTML entry per page ([`index.html`](index.html), [`music/index.html`](music/index.html)), so GitHub Pages serves `/music/` with a 200 instead of a hash route or a `404.html` fallback. [`src/App.jsx`](src/App.jsx) picks the page from `location.pathname`.
+All four are real URLs. [`vite.config.js`](vite.config.js) builds one HTML entry per page (`index.html`, `projects/index.html`, `research/index.html`, `music/index.html`), each with its own title and description, so GitHub Pages serves them with a 200 instead of a hash route or a `404.html` fallback. [`src/App.jsx`](src/App.jsx) picks the page from `location.pathname`. To add a page, add an entry to `PAGES` in `App.jsx`, a folder with an `index.html`, and an input in `vite.config.js`.
 
 Zero runtime dependencies beyond React.
 
@@ -64,7 +66,7 @@ curl -s https://sathvikloke.github.io/listening.json -o public/listening.json
 
 ## Editing the content
 
-**Everything the site says lives in [`src/data.js`](src/data.js).** Write links inline as `[text](url)`.
+**Everything the site says lives in [`src/data.js`](src/data.js).** Write links inline as `[text](url)`. Papers go in `papers`, newest first; "S. Loke" is bolded automatically in each author list.
 
 ```bash
 npm install

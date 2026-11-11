@@ -1,8 +1,16 @@
-import { intro, thingsHeading, things, music, contact } from './data'
+import { intro, thingsHeading, things, projects, papers, music, contact } from './data'
 import { useListening, ago } from './Listening'
 import Signature from './Signature'
 
-const onMusic = window.location.pathname.startsWith('/music')
+const PAGES = [
+  ['home', '/'],
+  ['projects', '/projects/'],
+  ['research', '/research/'],
+  ['music', '/music/'],
+]
+
+const path = window.location.pathname
+const page = PAGES.slice(1).find(([, href]) => path.startsWith(href.slice(0, -1)))?.[0] ?? 'home'
 
 // Renders "[text](url)" spans in data.js strings as links.
 function Inline({ text }) {
@@ -44,6 +52,40 @@ function Home() {
           {' — '}<a href="/music/">more music</a>
         </p>
       )}
+    </>
+  )
+}
+
+function Projects() {
+  return (
+    <>
+      <p>previous projects.</p>
+      <ul>
+        {projects.map((t, i) => <li key={i}><Inline text={t} /></li>)}
+      </ul>
+    </>
+  )
+}
+
+// Bolds the site owner's name in an author list.
+function Authors({ value }) {
+  const me = 'S. Loke'
+  return value.split(me).flatMap((part, i) => (i ? [<strong key={i}>{me}</strong>, part] : [part]))
+}
+
+function Research() {
+  return (
+    <>
+      <p>research.</p>
+      <ul className="papers">
+        {papers.map((p) => (
+          <li key={p.title}>
+            <a href={p.link}>{p.title}</a>
+            <span className="meta">{p.venue}</span>
+            <span className="meta"><Authors value={p.authors} /></span>
+          </li>
+        ))}
+      </ul>
     </>
   )
 }
@@ -92,13 +134,18 @@ export default function App() {
       <div className="col">
         <header>
           <nav>
-            {onMusic ? <a href="/">home</a> : <span>home</span>}
-            {' · '}
-            {onMusic ? <span>music</span> : <a href="/music/">music</a>}
+            {PAGES.map(([name, href], i) => (
+              <span key={name}>
+                {i > 0 && ' · '}
+                {name === page ? <span className="here">{name}</span> : <a href={href}>{name}</a>}
+              </span>
+            ))}
           </nav>
         </header>
 
-        <main>{onMusic ? <Music /> : <Home />}</main>
+        <main>
+          {{ home: <Home />, projects: <Projects />, research: <Research />, music: <Music /> }[page]}
+        </main>
 
         <footer>
           <p>

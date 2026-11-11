@@ -9,11 +9,16 @@ export default defineConfig({
   // For a user site (username.github.io) keep this as '/'.
   // For a PROJECT repo, change to '/your-repo-name/'.
   base: '/',
-  // One HTML entry per page so /music/ is a real URL that GitHub Pages serves
-  // with a 200, not a hash route or a 404.html fallback.
+  // One HTML entry per page so /music/ etc. are real URLs that GitHub Pages
+  // serves with a 200, not a hash route or a 404.html fallback.
   build: {
     rollupOptions: {
-      input: { main: page('./index.html'), music: page('./music/index.html') },
+      input: {
+        main: page('./index.html'),
+        projects: page('./projects/index.html'),
+        research: page('./research/index.html'),
+        music: page('./music/index.html'),
+      },
     },
   },
 })

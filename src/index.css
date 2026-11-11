@@ -58,8 +58,18 @@ a:hover { text-decoration-color: var(--accent); }
 .lc a:hover { text-decoration-color: var(--accent); }
 
 header { margin-bottom: var(--line); }
+
+.papers li + li { margin-top: calc(var(--line) / 2); }
+.meta {
+  display: block;
+  text-indent: 0;
+  color: var(--ink-soft);
+  font-size: 15px;
+  line-height: 24px;
+}
+.meta strong { font-weight: 500; color: var(--ink); }
 nav { color: var(--ink-soft); }
-nav span { color: var(--ink); }
+nav .here { color: var(--ink); }
 
 footer { margin-top: calc(var(--line) * 2); }
 footer p { margin: 0 0 calc(var(--line) / 2); }
