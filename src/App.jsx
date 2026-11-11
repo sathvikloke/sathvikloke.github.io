@@ -1,6 +1,7 @@
 import { intro, thingsHeading, things, projects, papers, music, contact } from './data'
 import { useListening, ago } from './Listening'
 import Signature from './Signature'
+import Scene from './Scene'
 
 const PAGES = [
   ['home', '/'],
@@ -46,7 +47,7 @@ function Home() {
       </ul>
 
       {head && (
-        <p>
+        <p className="mono">
           {live ? 'listening to: ' : 'last played: '}
           <Track t={head} live={live} />
           {' — '}<a href="/music/">more music</a>
@@ -156,6 +157,7 @@ export default function App() {
           <Signature />
         </footer>
       </div>
+      <Scene />
     </div>
   )
 }

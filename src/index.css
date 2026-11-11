@@ -1,35 +1,55 @@
 :root {
-  --line: 30px;
+  --line: 28px;
+  --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
   --col: 600px;
+  --band: clamp(210px, 22vw, 280px); /* height of the background drawing */
 
-  --paper: #fff;
-  --ink: #23262d;
-  --ink-soft: #6b717c;
-  --pen: #2b4c8c;           /* blue ballpoint, for the signature */
-  --accent: #c2402f;
+  --bg: #0b0d11;
+  --ink: #eef1f6;
+  --ink-soft: #94a0b4;
+  --accent: #2458f5;
+  --accent-soft: #8caaff;
+  --pen: #8caaff;           /* the signature */
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
 
-html { background: var(--paper); }
+html { background: var(--bg); }
 
 body {
   margin: 0;
   color: var(--ink);
-  font: 400 18px/var(--line) 'Newsreader', Georgia, 'Times New Roman', serif;
-  font-optical-sizing: auto;
+  font: 400 16.5px/var(--line) 'IBM Plex Sans', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
 /* One column in the middle of the screen. min-height, not height, so a page
    taller than the window grows and scrolls instead of being clipped. */
 .sheet {
+  position: relative;
   min-height: 100vh;
   min-height: 100svh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: calc(var(--line) * 2) 20px;
+  /* The bottom padding keeps the content clear of the drawing. */
+  padding: calc(var(--line) * 2) 20px calc(var(--band) + var(--line));
+  /* A faint blue wash rising from the drawing. */
+  background: linear-gradient(to top, rgb(36 88 245 / 0.07), transparent calc(var(--band) * 1.6));
+}
+
+.scene {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  /* Taller than the band: the top part holds only the mountain peaks, which
+     fade out as they rise into the page. Keep 1.7 in step with RISE. */
+  height: calc(var(--band) * 1.7);
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 45%);
+  mask-image: linear-gradient(to bottom, transparent, #000 45%);
 }
 
 .col { width: 100%; max-width: var(--col); }
@@ -46,16 +66,16 @@ a {
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
-  text-decoration-color: color-mix(in srgb, var(--ink) 35%, transparent);
+  text-decoration-color: color-mix(in srgb, var(--ink) 30%, transparent);
   transition: text-decoration-color 120ms;
 }
-a:hover { text-decoration-color: var(--accent); }
+a:hover { color: var(--accent-soft); text-decoration-color: var(--accent-soft); }
 
 .soft { color: var(--ink-soft); }
 .lc { text-transform: lowercase; }
 /* Song and artist lists would be a wall of underlines; show them on hover. */
 .lc a { text-decoration-color: transparent; }
-.lc a:hover { text-decoration-color: var(--accent); }
+.lc a:hover { color: var(--accent-soft); text-decoration-color: var(--accent-soft); }
 
 header { margin-bottom: var(--line); }
 
@@ -64,11 +84,11 @@ header { margin-bottom: var(--line); }
   display: block;
   text-indent: 0;
   color: var(--ink-soft);
-  font-size: 15px;
-  line-height: 24px;
+  font: 400 12.5px/22px var(--mono);
 }
 .meta strong { font-weight: 500; color: var(--ink); }
-nav { color: var(--ink-soft); }
+.mono { font: 400 13px/var(--line) var(--mono); }
+nav { color: var(--ink-soft); font: 400 13px/var(--line) var(--mono); }
 nav .here { color: var(--ink); }
 
 footer { margin-top: calc(var(--line) * 2); }
