@@ -2,7 +2,7 @@
 
 # sathvikloke.github.io
 
-**A plain white personal site: one centered column, a signature that writes itself, and a music page fed by real listening data.**
+**A dark personal site: one centered column over a living background of AI agents and a heartbeat, a signature that writes itself, and a music page fed by real listening data.**
 
 [![Live](https://img.shields.io/badge/LIVE-sathvikloke.github.io-2b4c8c?style=for-the-badge)](https://sathvikloke.github.io)
 [![React](https://img.shields.io/badge/React-18.3-f4f7fb?style=for-the-badge&logo=react&logoColor=2b4c8c)](https://react.dev)
@@ -27,7 +27,19 @@ Zero runtime dependencies beyond React.
 
 ## Layout
 
-[`src/index.css`](src/index.css) is one column, at most 600px wide, centered on a white page both horizontally and vertically. The `.sheet` uses `min-height` rather than `height`, so a page taller than the window, like the music page on a phone, grows and scrolls instead of being clipped. Text is left-aligned inside the column, set in Newsreader at 18px on a 30px line, with gaps in whole or half lines.
+[`src/index.css`](src/index.css) is one column, at most 600px wide, centered horizontally and vertically on a dark ground (`#0b0d11`, with `#2458f5` / `#8caaff` blues). The `.sheet` uses `min-height` rather than `height`, so a page taller than the window grows and scrolls instead of being clipped. Its bottom padding equals the background band's height, so text never sits on the busy part of the drawing. Text is IBM Plex Sans at 16.5px on a 28px line; the nav, paper venues and "last played" line are JetBrains Mono.
+
+## The background
+
+[`src/Scene.jsx`](src/Scene.jsx) is one canvas pinned to the bottom of every page, in three layers:
+
+- **A heartbeat.** An ECG trace runs the width of the page, built as a sum of gaussians per beat (P, Q, R, S, T). A sweep moves along it like a bedside monitor, lighting the trace behind it.
+- **An agent network.** Nodes (agents drawn as `>_` prompts, plus a cross, heart, DNA helix, benzene ring and pill) are wired to each other and to the R peaks. When the sweep crosses a wired beat, a signal climbs to that agent, which lights up and passes it on to its neighbours, two hops out.
+- **Contour mountains.** Behind everything, a range drawn as stacked contour lines, front to back. Each line is hidden wherever a nearer line already covers it, the same trick as a ridgeline plot. The peaks sit toward the edges, so the text column has a valley under it.
+
+The canvas is 1.7× the band's height (`RISE` in the script, `* 1.7` in the CSS; keep them in step). The extra height holds only the peaks, and a CSS mask fades them out as they rise into the page.
+
+The layout is seeded, so it's the same drawing on every visit. The dim structure is drawn once per resize to an offscreen canvas, and each frame only adds the sweep, the signals and the lit nodes. It stops drawing while scrolled out of view, and `prefers-reduced-motion` gets the still drawing.
 
 ## The signature
 
@@ -85,9 +97,9 @@ The repo is named `sathvikloke.github.io`, which serves from the root, so `vite.
 
 | | |
 |---|---|
-| JS | 151 kB raw, **49.6 kB gzipped** (almost all of it React) |
-| CSS | 1.8 kB raw, **0.8 kB gzipped** |
-| Webfonts | Newsreader, from Google Fonts |
+| JS | 162 kB raw, **54.4 kB gzipped** (mostly React; the scene is about 10 kB) |
+| CSS | 2.6 kB raw, **1.1 kB gzipped** |
+| Webfonts | IBM Plex Sans and JetBrains Mono, from Google Fonts |
 
 ## Accessibility
 
