@@ -15,7 +15,7 @@ export const things = [
   'co-founded [vivantal](https://vivantal.com): catches the follow-ups clinicians miss, and patient records never leave the browser',
   'building [preceptor](https://preceptorhosa.com): a free practice question bank for hosa competitive events',
   'researching at various distinguished universities in radiology, computational biology, and ml',
-  'first-author papers at [neurips](https://openreview.net/forum?id=Z2BvmuSLee) and [miccai](https://papers.miccai.org/miccai-2026-sat/UNSURE2026_002.html), the miccai one published by springer nature',
+  'first-author papers at [neurips](https://openreview.net/forum?id=rZfK1C8pw7) and [miccai](https://papers.miccai.org/miccai-2026-sat/UNSURE2026_002.html), the miccai one published by springer nature',
   'co-authored papers at [neurips](https://openreview.net/forum?id=062LO7IHtj) and [emnlp](https://aclanthology.org/2026.groundlm-1.16/). [all 8 papers](/research/)',
   'usabo semifinalist and 2x aime qualifier',
   'play cello for patients in hospice memory care',
@@ -30,7 +30,7 @@ export const projects = [
 export const papers = [
   {
     title: 'Silent Failure: How Standard Metrics Overstate Capability in Deep Learning MRI Reconstruction',
-    link: 'https://openreview.net/forum?id=Z2BvmuSLee',
+    link: 'https://openreview.net/forum?id=rZfK1C8pw7',
     venue: 'rcmlr @ neurips',
     authors: 'S. Loke, E. Johnson, J. K. Bande, N. S. V. Movva',
   },
@@ -54,7 +54,7 @@ export const papers = [
   },
   {
     title: 'Text Prototypes are Geometric Anchors, Not Semantic Concepts: A Causal Falsification of Interpretability Claims in CLIP-Based Medical Vision–Language Fusion',
-    link: 'https://openreview.net/forum?id=rZfK1C8pw7',
+    link: 'https://openreview.net/forum?id=Z2BvmuSLee',
     venue: 'mi4medfm @ miccai · now under review at an elsevier journal',
     authors: 'S. Loke',
   },
